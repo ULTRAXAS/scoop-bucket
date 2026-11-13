@@ -1,0 +1,84 @@
+{
+    "$schema": "https://raw.githubusercontent.com/ScoopInstaller/Scoop/master/schema.json",
+    "version": "3.0.1",
+    "description": "Autonomous AI coding agent CLI from ULTRAXAS",
+    "homepage": "https://github.com/ULTRAXAS/xro",
+    "license": "Apache-2.0",
+    "depends": "nodejs",
+    "architecture": {
+        "64bit": {
+            "url": [
+                "https://registry.npmjs.org/@ultraxas/xro/-/xro-3.0.1.tgz",
+                "https://registry.npmjs.org/@ultraxas/cli-windows-x64/-/cli-windows-x64-3.0.1.tgz"
+            ],
+            "hash": [
+                "ff7f50de28e017ca7b4c118b26a2f3bb5537e915d8dd214b2847097a66fe7ce1",
+                "85b6f2cc8bc4cd77d3b6f495e9e8fbf48852dca67c6ac9f1c7b7ee1c9182ed1d"
+            ]
+        },
+        "arm64": {
+            "url": [
+                "https://registry.npmjs.org/@ultraxas/xro/-/xro-3.0.1.tgz",
+                "https://registry.npmjs.org/@ultraxas/cli-windows-arm64/-/cli-windows-arm64-3.0.1.tgz"
+            ],
+            "hash": [
+                "ff7f50de28e017ca7b4c118b26a2f3bb5537e915d8dd214b2847097a66fe7ce1",
+                "464fe438ff932e615e68ac69179ba44cf567d0ce2a7eed3d32a507c70c9dc3a2"
+            ]
+        }
+    },
+    "extract_to": [
+        "wrapper",
+        "platform"
+    ],
+    "pre_install": [
+        "$wrapper = Join-Path $dir 'wrapper\\package'",
+        "$platform = Join-Path $dir 'platform\\package'",
+        "if (!(Test-Path -LiteralPath $wrapper)) { throw 'Xro wrapper package was not extracted as expected.' }",
+        "if (!(Test-Path -LiteralPath $platform)) { throw 'Xro platform package was not extracted as expected.' }",
+        "$platName = if ($architecture -eq 'arm64') { 'cli-windows-arm64' } else { 'cli-windows-x64' }",
+        "Copy-Item -Path (Join-Path $wrapper '*') -Destination $dir -Recurse -Force",
+        "$platDest = Join-Path $dir \"node_modules\\@ultraxas\\$platName\"",
+        "New-Item -ItemType Directory -Path $platDest -Force | Out-Null",
+        "Copy-Item -Path (Join-Path $platform '*') -Destination $platDest -Recurse -Force",
+        "Remove-Item -Path (Join-Path $dir 'wrapper'), (Join-Path $dir 'platform') -Recurse -Force",
+        "Set-Content -Path (Join-Path $dir 'xro.cmd') -Value '@echo off`r`nnode \"%~dp0bin\\xro\" %*' -Encoding ASCII"
+    ],
+    "bin": "xro.cmd",
+    "checkver": {
+        "url": "https://registry.npmjs.org/@ultraxas/xro/latest",
+        "jsonpath": "$.version"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": [
+                    "https://registry.npmjs.org/@ultraxas/xro/-/xro-$version.tgz",
+                    "https://registry.npmjs.org/@ultraxas/cli-windows-x64/-/cli-windows-x64-$version.tgz"
+                ],
+                "hash": [
+                    {
+                        "mode": "download"
+                    },
+                    {
+                        "mode": "download"
+                    }
+                ]
+            },
+            "arm64": {
+                "url": [
+                    "https://registry.npmjs.org/@ultraxas/xro/-/xro-$version.tgz",
+                    "https://registry.npmjs.org/@ultraxas/cli-windows-arm64/-/cli-windows-arm64-$version.tgz"
+                ],
+                "hash": [
+                    {
+                        "mode": "download"
+                    },
+                    {
+                        "mode": "download"
+                    }
+                ]
+            }
+        }
+    }
+}
